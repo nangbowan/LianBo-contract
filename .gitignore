@@ -2,12 +2,11 @@
 .DS_Store
 .vscode
 .idea
-node_modules
-!node_modules/@antchain
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+node_moudules
+!node_moudules/@antchain
 # build
 dist
 
