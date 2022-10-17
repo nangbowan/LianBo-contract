@@ -5,8 +5,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-node_moudules
-!node_moudules/@antchain
+node_modules/*
+!node_modules/@antchain
 # build
 dist
 

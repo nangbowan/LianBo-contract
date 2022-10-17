@@ -3,6 +3,7 @@ import {
   Storage,
   JSON,
   DRC721_draft,
+  StorageMap,
 } from "@antchain/myassembly";
 import {
   Address,
@@ -48,6 +49,13 @@ export default class LianBoContract extends DRC721_draft {
     "accessories",
   ];
 
+
+  //定义部件权重
+  //WEB3:一律为0
+  //CARBON:一律为1
+  //ANTCHAIN:一律为2
+  private ambassadorWeight: StorageMap<string,u32> = new StorageMap<string,u32>("ambassadorweight",new Map());
+
   constructor() {
     super({
       //发布者的账户地址
@@ -71,6 +79,11 @@ export default class LianBoContract extends DRC721_draft {
     this.ambassadorsList.set(WEB3, 0);
     this.ambassadorsList.set(CARBON, 121);
     this.ambassadorsList.set(ANTCHAIN, 242);
+
+    //初始化大使部件权重
+    this.ambassadorWeight.setItem(WEB3,0);
+    this.ambassadorWeight.setItem(CARBON,1);
+    this.ambassadorWeight.setItem(ANTCHAIN,3);
   }
 
   //测试合约部署
@@ -171,6 +184,7 @@ export default class LianBoContract extends DRC721_draft {
     const assetObj = JSON.Value.Object();
 
     let ambassadorChoiceStr: string = "DEFAULT";
+
     if (ambassadorChoice == 0) {
       ambassadorChoiceStr = WEB3;
     } else if (ambassadorChoice == 1) {
@@ -229,7 +243,7 @@ export default class LianBoContract extends DRC721_draft {
       return "null";
     }
 
-    //不是第一次铸造才可以调用交换铸造
+    //要求不是第一次铸造
     if(!this.ambassadorRandomMap.has(owner)){
       this.log("this is your first mint!");
       return "null";
@@ -259,7 +273,7 @@ export default class LianBoContract extends DRC721_draft {
 
       this.replaceIssue(owner,assetObj.toString());
 
-      //这里不加
+      //这里资产数量不增加因为只是替换
       this.count.setData(currentCount);
 
       this.changeRandom3(owner, uniqueRandom);
@@ -288,6 +302,10 @@ export default class LianBoContract extends DRC721_draft {
 
 
 
+  /**
+   * 测试函数
+   * @returns 
+   */
   @EXPORT
   public print():string{
     //定义铸造者

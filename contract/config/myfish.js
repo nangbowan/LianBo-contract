@@ -3,7 +3,7 @@ module.exports = {
   // 合约相关配置
   contract: {
     type: 'assemblyscript',
-    name: 'LianBo-Dapp0.6',
+    name: 'LianBo-Dapp0.7',
     version: 1,
   },
   // rest 链接链相关配置
@@ -19,5 +19,8 @@ module.exports = {
     accountPrivateKeyPassword: 'coolSWJ7327!',
   },
 };
+
+
+//最新交易hash：0x3f7bbd80188f8b7e04469f9162a0c6608812ab037c89e9f59e66269c1721d506
 
 
