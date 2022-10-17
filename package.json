@@ -1,0 +1,38 @@
+{
+  "name": "@antchain/myfish-scaffold-assemblyscript-dapp",
+  "version": "1.0.0-beta.13",
+  "scripts": {
+    "compile": "myfish compile",
+    "test": "myfish test",
+    "start": "npm run dev",
+    "dev": "cross-env APP_ROOT=web umi dev",
+    "build": "cross-env APP_ROOT=web umi build"
+  },
+  "dependencies": {
+    "@antchain/jssdk": "1.0.0-beta.13",
+    "@antchain/myassembly": "1.0.0-beta.13",
+    "antd": "^4.16.13"
+  },
+  "devDependencies": {
+    "@antchain/myfish": "^1.0.0-beta.13",
+    "@umijs/preset-react": "1.x",
+    "cross-env": "^7.0.3",
+    "umi": "^3.5.20",
+    "umi-plugin-myfish": "1.0.0-beta.13"
+  },
+  "files": [
+    "contract/assembly",
+    "contract/config/myfish.js",
+    "contract/config/certs",
+    "contract/tsconfig.json",
+    "web",
+    "package.json",
+    ".gitignore",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "gitHead": "b11a7d9534341d2abc955daa734eb752acb029ef"
+}
