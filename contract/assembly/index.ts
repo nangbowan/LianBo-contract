@@ -5,14 +5,7 @@ import {
   DRC721_draft,
   StorageMap,
 } from "@antchain/myassembly";
-import {
-  Address,
-  Attribute,
-  WEB3,
-  CARBON,
-  ANTCHAIN,
-  DEFAULT,
-} from "./types";
+import { Address, Attribute, WEB3, CARBON, ANTCHAIN, DEFAULT } from "./types";
 
 export default class LianBoContract extends DRC721_draft {
   //定义私人白名单
@@ -33,12 +26,15 @@ export default class LianBoContract extends DRC721_draft {
   private owner: Storage<Address>;
 
   //随机种子Map
-  public ambassadorRandomMap: Map<Address, u32> = new Map<string, u32>();
+  public ambassadorRandomMap: StorageMap<string, u32> = new StorageMap<string, u32>(
+    'ambassadorRandom',
+    new Map(),
+  );
   //定义大使身份:初始只有三个web3推广官，蚂蚁链教育官，碳中和生活官
-  public ambassadorsList: Map<string, u32> = new Map<
-    string,
-    u32
-  >();
+  public ambassadorsList: StorageMap<string, u32> = new StorageMap<string, u32>(
+    'ambassadorType',
+    new Map(),
+  );
 
   //定义组件顺序
   private attributeOrder: Attribute[] = [
@@ -49,12 +45,14 @@ export default class LianBoContract extends DRC721_draft {
     "accessories",
   ];
 
-
   //定义部件权重
   //WEB3:一律为0
   //CARBON:一律为1
   //ANTCHAIN:一律为2
-  private ambassadorWeight: StorageMap<string,u32> = new StorageMap<string,u32>("ambassadorweight",new Map());
+  private ambassadorWeight: StorageMap<string, u32> = new StorageMap<
+    string,
+    u32
+  >("ambassadorweight", new Map());
 
   constructor() {
     super({
@@ -76,14 +74,14 @@ export default class LianBoContract extends DRC721_draft {
     this.perIdentityLimit = 1;
 
     //初始化基本大使身份以及对应随机粒子
-    this.ambassadorsList.set(WEB3, 0);
-    this.ambassadorsList.set(CARBON, 121);
-    this.ambassadorsList.set(ANTCHAIN, 242);
+    this.ambassadorsList.setItem(WEB3, 0);
+    this.ambassadorsList.setItem(CARBON, 121);
+    this.ambassadorsList.setItem(ANTCHAIN, 242);
 
     //初始化大使部件权重
-    this.ambassadorWeight.setItem(WEB3,0);
-    this.ambassadorWeight.setItem(CARBON,1);
-    this.ambassadorWeight.setItem(ANTCHAIN,3);
+    this.ambassadorWeight.setItem(WEB3, 0);
+    this.ambassadorWeight.setItem(CARBON, 1);
+    this.ambassadorWeight.setItem(ANTCHAIN, 2);
   }
 
   //测试合约部署
@@ -100,7 +98,7 @@ export default class LianBoContract extends DRC721_draft {
    * 初始化随机形象
    * @param uniqueRandom 传入随机粒子
    * @param ambassadorUri ipfs图片Url
-   * @returns 
+   * @returns
    */
   @EXPORT
   public initMint(uniqueRandom: u32, ambassadorUri: string): string {
@@ -114,6 +112,7 @@ export default class LianBoContract extends DRC721_draft {
       this.log(`your uniqueRandom is unvaild!`);
       return "null";
     }
+
     //查看是否超过总铸造值
     if (currentCount > this.totalSupply) {
       this.log(`Total supply is ${this.totalSupply}`);
@@ -193,7 +192,7 @@ export default class LianBoContract extends DRC721_draft {
       ambassadorChoiceStr = ANTCHAIN;
     }
     //直接通过数字选择确定身份随机粒子
-    const identityRandom: u32 = this.ambassadorsList.get(ambassadorChoiceStr);
+    const identityRandom: u32 = this.ambassadorsList.getItemWithoutNULL(ambassadorChoiceStr);
 
     //铸造
     assetObj.set("assetInfo", ambassadorChoiceStr);
@@ -219,7 +218,6 @@ export default class LianBoContract extends DRC721_draft {
    */
   @EXPORT
   public exchangeMint(uniqueRandom: u32, ambassadorUri: string): string {
-
     //获取当前tokenId
     const currentCount = this.count.getData();
     //定义铸造者
@@ -244,7 +242,7 @@ export default class LianBoContract extends DRC721_draft {
     }
 
     //要求不是第一次铸造
-    if(!this.ambassadorRandomMap.has(owner)){
+    if (!this.ambassadorRandomMap.hasItem(owner)) {
       this.log("this is your first mint!");
       return "null";
     }
@@ -271,7 +269,7 @@ export default class LianBoContract extends DRC721_draft {
       assetObj.set("assetInfo", ambassadorChoiceStr);
       assetObj.set("assetUri", ambassadorUri);
 
-      this.replaceIssue(owner,assetObj.toString());
+      this.replaceIssue(owner, assetObj.toString());
 
       //这里资产数量不增加因为只是替换
       this.count.setData(currentCount);
@@ -288,7 +286,7 @@ export default class LianBoContract extends DRC721_draft {
       assetObj.set("assetInfo", uniqueRandom.toString());
       assetObj.set("assetUri", ambassadorUri);
 
-      this.replaceIssue(owner,assetObj.toString());
+      this.replaceIssue(owner, assetObj.toString());
 
       //这里不加
       this.count.setData(currentCount);
@@ -300,18 +298,29 @@ export default class LianBoContract extends DRC721_draft {
     }
   }
 
-
-
   /**
    * 测试函数
-   * @returns 
+   * @returns
    */
   @EXPORT
-  public print():string{
+  public print(): string {
     //定义铸造者
     const owner = my.getSender().str;
 
-    return this.GetAssets(owner)
+    return this.GetAssets(owner);
+  }
+
+  /**
+   * 通过地址获取地址身份粒子
+   */
+  @EXPORT
+  public getAmbassadorRandom(): u32 {
+    const owner = my.getSender().str;
+    if (this.ambassadorRandomMap.hasItem(owner)) {
+      return this.ambassadorRandomMap.getItemWithoutNULL(owner);
+    } else {
+      return -1;
+    }
   }
 
   /**
@@ -321,15 +330,12 @@ export default class LianBoContract extends DRC721_draft {
    * @returns
    */
   @EXPORT
-  public addAmbassadorType(
-    ambassadorType: string,
-    identityRandom: u32
-  ): bool {
+  public addAmbassadorType(ambassadorType: string, identityRandom: u32): bool {
     if (!this.isOwner()) {
       this.log("only contract owner can manage!");
       return false;
     }
-    this.ambassadorsList.set(ambassadorType, identityRandom);
+    this.ambassadorsList.setItem(ambassadorType, identityRandom);
     return true;
   }
 
@@ -339,11 +345,10 @@ export default class LianBoContract extends DRC721_draft {
    * @param uniqueRandom 随机种子
    * @returns
    */
-  private setRandom3(owner: string, uniqueRandom: u32): bool {
+  private setRandom3(owner: string, uniqueRandom: u32): void {
     //存储地址身份随机种子
-    this.ambassadorRandomMap.set(owner, uniqueRandom);
+    this.ambassadorRandomMap.setItem(owner, uniqueRandom);
 
-    return true;
   }
 
   /**
@@ -353,12 +358,12 @@ export default class LianBoContract extends DRC721_draft {
    * @returns
    */
   private changeRandom3(owner: string, changeRandom3: u32): bool {
-    if (!this.ambassadorRandomMap.has(owner)) {
+    if (!this.ambassadorRandomMap.hasItem(owner)) {
       this.log("your random msg not exsits");
       return false;
     }
 
-    this.ambassadorRandomMap.set(owner, changeRandom3);
+    this.ambassadorRandomMap.setItem(owner, changeRandom3);
 
     return true;
   }
