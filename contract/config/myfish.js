@@ -3,7 +3,7 @@ module.exports = {
   // 合约相关配置
   contract: {
     type: 'assemblyscript',
-    name: 'LianBo-Dapp0.9',
+    name: 'LianBo-Dapp1.0',
     version: 1,
   },
   // rest 链接链相关配置
