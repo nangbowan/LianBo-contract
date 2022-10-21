@@ -3,7 +3,7 @@ module.exports = {
   // 合约相关配置
   contract: {
     type: 'assemblyscript',
-    name: 'LianBo-Dapp1.0',
+    name: 'LianBo-Dapp1.1',
     version: 1,
   },
   // rest 链接链相关配置
@@ -21,6 +21,6 @@ module.exports = {
 };
 
 
-//最新交易hash：0x3f7bbd80188f8b7e04469f9162a0c6608812ab037c89e9f59e66269c1721d506
+//最新交易hash：0xe17688d933145001eb9fabb9a32f382b3a01989c5b554c0fddf69759901b3f94
 
 
